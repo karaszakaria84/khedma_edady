@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مسابقة كروت الشحن</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Tahoma, Arial, sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at top right,#263b5c 0%,transparent 35%),
+        radial-gradient(circle at bottom left,#182642 0%,transparent 40%),
+        #05070d;
+    color:white;
+    padding:25px;
+}
+
+.container{
+    width:100%;
+    max-width:1100px;
+    margin:auto;
+}
+
+.header{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.header h1{
+    font-size:52px;
+    color:#ffd54a;
+    text-shadow:
+        0 0 10px rgba(255,213,74,.4),
+        0 0 25px rgba(255,213,74,.2);
+    margin-bottom:15px;
+}
+
+.header p{
+    font-size:24px;
+    color:#cfcfcf;
+}
+
+.codes{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:25px;
+    margin-bottom:30px;
+}
+
+.code-box{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:22px;
+    padding:30px;
+    text-align:center;
+    backdrop-filter:blur(10px);
+}
+
+.code-box h2{
+    font-size:31px;
+    margin-bottom:20px;
+}
+
+.code{
+    display:inline-block;
+    background:#080b12;
+    border:2px solid #ffd54a;
+    color:#ffd54a;
+    padding:15px 28px;
+    border-radius:14px;
+    font-size:30px;
+    font-weight:bold;
+    direction:ltr;
+}
+
+.show-button{
+    width:100%;
+    padding:22px;
+    border:none;
+    border-radius:17px;
+    background:linear-gradient(135deg,#ffd54a,#ff9f1c);
+    color:#111;
+    font-size:28px;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 8px 25px rgba(255,180,0,.2);
+    transition:.25s;
+}
+
+.show-button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 35px rgba(255,180,0,.35);
+}
+
+#quizSection{
+    display:none;
+    margin-top:30px;
+}
+
+.quiz-card{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:25px;
+    padding:35px;
+    box-shadow:0 15px 50px rgba(0,0,0,.3);
+}
+
+.question{
+    font-size:40px;
+    line-height:1.8;
+    text-align:center;
+    font-weight:bold;
+    margin-bottom:35px;
+    min-height:100px;
+}
+
+.answers{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.answer{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:15px;
+    direction:rtl;
+    width:100%;
+    min-height:90px;
+    padding:18px 22px;
+    background:#101521;
+    border:2px solid #303747;
+    color:white;
+    border-radius:16px;
+    font-size:27px;
+    text-align:right;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.answer-number{
+    flex-shrink:0;
+    width:50px;
+    height:50px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:#202838;
+    border:2px solid #566078;
+    color:#ffd54a;
+    font-size:23px;
+    font-weight:bold;
+}
+
+.answer-text{
+    flex:1;
+    line-height:1.5;
+}
+
+.answer:hover{
+    border-color:#ffd54a;
+    background:#171d2b;
+    transform:translateY(-3px);
+}
+
+.answer.selected{
+    background:rgba(255,213,74,.15);
+    border-color:#ffd54a;
+    box-shadow:0 0 15px rgba(255,213,74,.12);
+}
+
+.answer.selected .answer-number{
+    background:#ffd54a;
+    border-color:#ffd54a;
+    color:#111;
+}
+
+.navigation{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    margin-top:30px;
+}
+
+.nav-button{
+    padding:20px;
+    border:none;
+    border-radius:15px;
+    font-size:25px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.previous{
+    background:#303747;
+    color:white;
+}
+
+.previous:hover{
+    background:#414b5e;
+}
+
+.next{
+    background:linear-gradient(135deg,#ffd54a,#ff9f1c);
+    color:#111;
+}
+
+.next:hover{
+    transform:translateY(-2px);
+}
+
+#hashScreen{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:#05070d;
+    z-index:99999;
+    align-items:center;
+    justify-content:center;
+}
+
+.hash-content{
+    text-align:center;
+}
+
+.doss-text{
+    font-size:65px;
+    font-weight:bold;
+    color:white;
+    margin-bottom:15px;
+}
+
+.hash-symbol{
+    font-size:200px;
+    font-weight:bold;
+    color:#ffd54a;
+    text-shadow:
+        0 0 20px rgba(255,213,74,.5),
+        0 0 50px rgba(255,213,74,.25);
+}
+
+@media(max-width:700px){
+
+    body{
+        padding:12px;
+    }
+
+    .header h1{
+        font-size:38px;
+    }
+
+    .header p{
+        font-size:20px;
+    }
+
+    .codes{
+        grid-template-columns:1fr;
+    }
+
+    .code-box h2{
+        font-size:27px;
+    }
+
+    .code{
+        font-size:25px;
+    }
+
+    .show-button{
+        font-size:24px;
+    }
+
+    .quiz-card{
+        padding:20px;
+    }
+
+    .question{
+        font-size:31px;
+    }
+
+    .answers{
+        grid-template-columns:1fr;
+    }
+
+    .answer{
+        font-size:23px;
+        min-height:82px;
+    }
+
+    .answer-number{
+        width:46px;
+        height:46px;
+        font-size:21px;
+    }
+
+    .navigation{
+        grid-template-columns:1fr;
+    }
+
+    .nav-button{
+        font-size:22px;
+    }
+
+    .doss-text{
+        font-size:48px;
+    }
+
+    .hash-symbol{
+        font-size:150px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1> مسابقة كروت الشحن</h1>
+
+        <p>
+            جاوب على الأسئلة واربح كارت الشحن
+        </p>
+
+    </div>
+
+
+    <div class="codes">
+
+        <div class="code-box">
+
+            <h2> كود الوحدات</h2>
+
+            <div class="code">
+                #102*1*
+            </div>
+
+        </div>
+
+
+        <div class="code-box">
+
+            <h2> كود الميجابايتس</h2>
+
+            <div class="code">
+                #102*2*
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <button class="show-button" onclick="startQuiz()">
+        عرض الأسئلة
+    </button>
+
+
+    <section id="quizSection">
+
+        <div class="quiz-card">
+
+            <div class="question" id="question"></div>
+
+            <div class="answers" id="answers"></div>
+
+
+            <div class="navigation">
+
+                <button
+                    class="nav-button previous"
+                    id="previousButton"
+                    onclick="previousQuestion()">
+                    ⬅ السؤال السابق
+                </button>
+
+
+                <button
+                    class="nav-button next"
+                    id="nextButton"
+                    onclick="nextQuestion()">
+                    السؤال التالي ➡
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<div id="hashScreen">
+
+    <div class="hash-content">
+
+        <div class="doss-text">
+            دوس
+        </div>
+
+        <div class="hash-symbol">
+            #
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const questions = [
+
+    {
+        question:"ما هو اطول جبل فى العالم",
+        answers:[
+            {number:"4",text:"الهيمالايا"},
+            {number:"3",text:"الانديز"},
+            {number:"2",text:"البحر الاحمر"},
+            {number:"1",text:"افريست"}
+        ]
+    },
+
+    {
+        question:"كم عدد اصحاحات انجيل لوقا",
+        answers:[
+            {number:"1",text:"16"},
+            {number:"2",text:"28"},
+            {number:"3",text:"24"},
+            {number:"4",text:"21"}
+        ]
+    },
+
+    {
+        question:"اطول فى نهر فى العالم",
+        answers:[
+            {number:"1",text:"نهر الامازون"},
+            {number:"2",text:"نهر اليانجتسى"},
+            {number:"3",text:"نهر المسيسبى"},
+            {number:"4",text:"نهر النيل"}
+        ]
+    },
+
+    {
+        question:"كم عدد رسايل بولس الرسول",
+        answers:[
+            {number:"6",text:"12"},
+            {number:"7",text:"13"},
+            {number:"8",text:"14"},
+            {number:"9",text:"15"}
+        ]
+    },
+
+    {
+        question:"كم عدد اسفار العهد القديم",
+        answers:[
+            {number:"0",text:"39"},
+            {number:"2",text:"40"},
+            {number:"4",text:"42"},
+            {number:"8",text:"43"}
+        ]
+    },
+
+    {
+        question:"ما هي أصغر دولة في العالم من حيث المساحة",
+        answers:[
+            {number:"6",text:"النرويج"},
+            {number:"7",text:"الفاتيكان"},
+            {number:"8",text:"جيبوتى"},
+            {number:"9",text:"قطر"}
+        ]
+    },
+
+    {
+        question:"ما هو اكبر كوكب في المجموعه الشمسيه",
+        answers:[
+            {number:"4",text:"زحل"},
+            {number:"6",text:"اورانوس"},
+            {number:"8",text:"المشترى"},
+            {number:"0",text:"الارض"}
+        ]
+    },
+
+    {
+        question:"ما هو الحيوان الذي يُعتبر أضخم حيوان على وجه الأرض",
+        answers:[
+            {number:"1",text:"الديناصور"},
+            {number:"2",text:"الحوت الازرق"},
+            {number:"3",text:"الزرافة"},
+            {number:"4",text:"الفيل"}
+        ]
+    },
+
+    {
+        question:"برج خليفة يوجد فى دولة",
+        answers:[
+            {number:"1",text:"ابو ظبى"},
+            {number:"3",text:"دبى"},
+            {number:"5",text:"قطر"},
+            {number:"7",text:"الرياض"}
+        ]
+    },
+
+    {
+        question:"ما هو أسرع حيوان بري في العالم",
+        answers:[
+            {number:"2",text:"النمر"},
+            {number:"4",text:"الاسد"},
+            {number:"6",text:"الفهد"},
+            {number:"8",text:"الكلب"}
+        ]
+    },
+
+    {
+        question:"ما أكبر عضو في جسم الإنسان",
+        answers:[
+            {number:"0",text:"الجلد"},
+            {number:"2",text:"المعدة"},
+            {number:"4",text:"الامعاء الغليظة"},
+            {number:"6",text:"البنكرياس"}
+        ]
+    },
+
+    {
+        question:"ما الحيوان الذي يُعرف بأنه أذكى الحيوانات",
+        answers:[
+            {number:"1",text:"الدولفين"},
+            {number:"2",text:"النملة"},
+            {number:"3",text:"القطة"},
+            {number:"4",text:"الذبابة"}
+        ]
+    },
+
+    {
+        question:"كم عدد احرف اللغة الانجليزية",
+        answers:[
+            {number:"2",text:"26"},
+            {number:"4",text:"28"},
+            {number:"6",text:"27"},
+            {number:"8",text:"30"}
+        ]
+    },
+
+    {
+        question:"ما هى اكبر هضبة فى العالم",
+        answers:[
+            {number:"6",text:"هضبة الدكن"},
+            {number:"7",text:"هضبة لبرادور"},
+            {number:"8",text:"هضبة غرب استراليا"},
+            {number:"9",text:"هضبة التبت"}
+        ]
+    },
+
+    {
+        question:"ما الحيوان الذي يمتلك ثلاثة قلوب",
+        answers:[
+            {number:"0",text:"الاخطبوط"},
+            {number:"2",text:"الحوت"},
+            {number:"4",text:"الفقمة"},
+            {number:"5",text:"الدولفين"}
+        ]
+    },
+
+    {
+        question:"ما الحيوان الذي لا يمتلك هيكلًا عظميًا خارجيًا أو داخليًا",
+        answers:[
+            {number:"1",text:"الاخطبوط"},
+            {number:"2",text:"قنديل البحر"},
+            {number:"3",text:"النمل"},
+            {number:"4",text:"الذبابة"}
+        ]
+    }
+
+];
+
+
+let currentQuestion = 0;
+
+let userAnswers =
+    new Array(questions.length).fill(null);
+
+
+function startQuiz(){
+
+    document.querySelector(".show-button").style.display="none";
+
+    document.getElementById("quizSection").style.display="block";
+
+    currentQuestion=0;
+
+    userAnswers =
+        new Array(questions.length).fill(null);
+
+    showQuestion();
+
+    window.scrollTo({
+        top:document.getElementById("quizSection").offsetTop,
+        behavior:"smooth"
+    });
+
+}
+
+
+function showQuestion(){
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("question").textContent =
+        q.question;
+
+
+    const answersBox =
+        document.getElementById("answers");
+
+    answersBox.innerHTML="";
+
+
+    q.answers.forEach((answer,index)=>{
+
+        const button =
+            document.createElement("button");
+
+        button.className="answer";
+
+
+        const number =
+            document.createElement("span");
+
+        number.className="answer-number";
+
+        number.textContent =
+            answer.number;
+
+
+        const text =
+            document.createElement("span");
+
+        text.className="answer-text";
+
+        text.textContent =
+            answer.text;
+
+
+        button.appendChild(number);
+
+        button.appendChild(text);
+
+
+        button.onclick=function(){
+
+            chooseAnswer(index);
+
+        };
+
+
+        answersBox.appendChild(button);
+
+    });
+
+
+    if(userAnswers[currentQuestion]!==null){
+
+        showOldAnswer();
+
+    }
+
+
+    const previousButton =
+        document.getElementById("previousButton");
+
+
+    if(currentQuestion===0){
+
+        previousButton.style.visibility="hidden";
+
+    }else{
+
+        previousButton.style.visibility="visible";
+
+    }
+
+}
+
+
+function chooseAnswer(index){
+
+    userAnswers[currentQuestion]=index;
+
+
+    const buttons =
+        document.querySelectorAll(".answer");
+
+
+    buttons.forEach(button=>{
+
+        button.classList.remove("selected");
+
+    });
+
+
+    buttons[index].classList.add("selected");
+
+}
+
+
+function showOldAnswer(){
+
+    const selected =
+        userAnswers[currentQuestion];
+
+
+    const buttons =
+        document.querySelectorAll(".answer");
+
+
+    if(selected===null){
+
+        return;
+
+    }
+
+
+    buttons[selected].classList.add("selected");
+
+}
+
+
+function nextQuestion(){
+
+    if(currentQuestion===questions.length-1){
+
+        document.getElementById("hashScreen").style.display="flex";
+
+        return;
+
+    }
+
+
+    currentQuestion++;
+
+    showQuestion();
+
+
+    window.scrollTo({
+
+        top:document.getElementById("quizSection").offsetTop,
+
+        behavior:"smooth"
+
+    });
+
+}
+
+
+function previousQuestion(){
+
+    if(currentQuestion===0){
+
+        return;
+
+    }
+
+
+    currentQuestion--;
+
+    showQuestion();
+
+
+    window.scrollTo({
+
+        top:document.getElementById("quizSection").offsetTop,
+
+        behavior:"smooth"
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>
